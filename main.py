@@ -1,4 +1,5 @@
 import os
+import json
 from config import Config
 from pdf_processor import extract_text_from_pdf, chunk_text
 from embedding_service import EmbeddingService
@@ -18,12 +19,15 @@ def main(pdf_path, questions):
     #slack_service = SlackService(slack_token=Config.SLACK_TOKEN)
 
     # Answer questions and post results to Slack
+    output = {}
     for question in questions:
         answer,token_count = qa_service.answer_question(question)
-        message = f"Question: {question}\nAnswer: {answer} \n\nToken_Used: {token_count}"
-        print(message)
-        #slack_service.post_message(Config.SLACK_CHANNEL, message)
-
+        output[question] = {"answer": answer, "token_used": token_count}
+    
+    json_output = json.dumps(output, indent=2)
+    print(json_output)
+    # slack message posting is commented as i don't have tokens or account, user can enable it after updating keys in config.py
+    #slack_service.post_message(Config.SLACK_CHANNEL, json_output)
 if __name__ == "__main__":
     pdf_folder = "pdf"
     pdf_filename = "handbook.pdf"  # Replace with your file name according to your requirement

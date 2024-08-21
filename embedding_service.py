@@ -30,14 +30,17 @@ class EmbeddingService:
                 input=question
             )
             question_embedding = question_embed_response['data'][0]['embedding']
-            
+
             # Calculate cosine similarities
             similarities = [1 - cosine(question_embedding, emb) for emb in self.embeddings]
+
+            # Get top_k indices with highest similarity, enable it if you want to save the token expenditure.
+            #top_indices = np.argsort(similarities)[-top_k:]
+            #return [self.text_chunks[i] for i in top_indices]
+
+            # Return all text chunks with their respective similarity scores
+            return list(zip(self.text_chunks, similarities))
             
-            # Get top_k indices with highest similarity
-            top_indices = np.argsort(similarities)[-top_k:]
-            
-            return [self.text_chunks[i] for i in top_indices]
         except Exception as e:
             print("Error:", e)
             raise RuntimeError("Failed to retrieve relevant text. Please try again later.")
